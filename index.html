@@ -29,6 +29,20 @@
 
 <body>
   <div class="container">
+    <div>
+      <div class="row"> <!-- Login form-->
+        <form onsubmit="onLogin()">
+          <label for="id">RoomID:</label>
+          <input type="text" id="room_id" name="room_id">
+          <label for="id">ID:</label>
+          <input type="text" id="id" name="id">
+          <label for="pw">Password:</label>
+          <input type="password" id="pw" name="pw">
+          <button class="btn btn-default" id="register" type="button">Register</button>
+          <button class="btn btn-default" id="login" type="button">Login</button>
+        </form>
+      </div>
+    </div>
     <div class="row">
       <div class="panel panel-primary" id="messageList"><!-- 대화 창 -->
       </div>
@@ -71,6 +85,10 @@
         list.find('div:first').remove(); // 메시지 삭제
     });
 
+    socket.on('error', function (msg) {
+      alert(msg);
+    })
+
     // 채팅 메시지를 서버에 보내는 함수
     send = function () {
       msg = $('#message').val()      // 입력 상자에서 메시지를 가져옴
@@ -79,6 +97,28 @@
         $('#message').val('');       // 입력한 데이터 삭제
       }
     }
+
+    // register handler function
+    tryLogin = function(type) {
+      room_id = $('#room_id').val();
+      id = $('#id').val();
+      pw = $('#pw').val();
+      
+      if(room_id != '' && id!='' && pw!='') { // check if values are valid
+        var result = room_id + '|' + id + '|' + pw;
+        socket.emit(type, result); // send values to server
+      } else {
+        alsert('Values are invalid!');
+      }
+    }
+
+    $('#register').click(function() { // bind register button handler
+      tryLogin('register'); // send form with message 'register'
+    });
+
+    $('#login').click(function() { // bind login button handler
+      tryLogin('login'); // send form with message 'login'
+    });
 
     // 보내기 버튼으로 메시지를 보냄
     $('#send').click(function () {
